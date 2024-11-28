@@ -1,5 +1,15 @@
 {
   "expo": {
+    "jsEngine": "jsc",
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
+      "expo-font"
+    ],
     "name": "react-native-meteo",
     "slug": "react-native-meteo",
     "version": "1.0.0",
