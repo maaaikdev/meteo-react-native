@@ -12,28 +12,36 @@ import { MeteoAPI } from "./api/meteo";
 import { useFonts } from "expo-font";
 
 export default function App() {
-  const [coordinates, setCoordinates] = useState();
-  const [weather, setWeather] = useState();
-  const [isFontLoaded] = useFonts({
-    "Alata-Regular": require("./assets/fonts/Alata-Regular.ttf"),
-  });
+	const [coordinates, setCoordinates] = useState();
+	const [weather, setWeather] = useState();
+	const [ city, setCity] = useState();
+	const [isFontLoaded] = useFonts({
+		"Alata-Regular": require("./assets/fonts/Alata-Regular.ttf"),
+	});
 
-  console.log("IS FONT", isFontLoaded);
-  useEffect(() => {
-    getUserCoordinates();
-  }, []);
+	console.log("IS FONT", isFontLoaded);
+	useEffect(() => {
+		getUserCoordinates();
+	}, []);
 
-  useEffect(() => {
-    if (coordinates) {
-      fetchWeatherByCoords(coordinates);
-    }
-  }, [coordinates]);
+	useEffect(() => {
+		if (coordinates) {
+			fetchWeatherByCoords(coordinates);
+			fetchCityByCoords(coordinates)
+			
+		}
+	}, [coordinates]);
 
   
-  async function fetchWeatherByCoords(coords) {
-	  const weatherResponse = await MeteoAPI.fetchWeatherByCoords(coords);
-	  setWeather(weatherResponse);
+  	async function fetchWeatherByCoords(coords) {
+	  	const weatherResponse = await MeteoAPI.fetchWeatherByCoords(coords);
+	  	setWeather(weatherResponse);
 	}
+
+	async function fetchCityByCoords(coords) {
+		const cityResponse = await MeteoAPI.fetchCityByCoords(coords);
+		setCity(cityResponse);
+  }
 	
 	async function getUserCoordinates() {
 		const { status } = await requestForegroundPermissionsAsync();
@@ -52,16 +60,16 @@ export default function App() {
 	console.log(weather);
 	
   return (
-    <ImageBackground
-      imageStyle={styles.img}
-      style={styles.img_background}
-      source={backgroundImg}
-    >
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.container}>
-          <Home />
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </ImageBackground>
-  );
+		<ImageBackground
+			imageStyle={styles.img}
+			style={styles.img_background}
+			source={backgroundImg}
+		>
+			<SafeAreaProvider>
+				<SafeAreaView style={styles.container}>
+					{isFontLoaded && <Home city={city} weather={weather}/>}
+				</SafeAreaView>
+			</SafeAreaProvider>
+		</ImageBackground>
+  	);
 }

@@ -9,8 +9,5 @@ export const styles = StyleSheet.create({
     },
     meteo_advanced: {
         flex: 1,
-    },
-    txt: {
-        
     }
 })

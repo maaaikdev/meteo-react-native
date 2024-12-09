@@ -1,22 +1,23 @@
 import { Image, Text, View } from "react-native";
 import { styles } from "./MeteoBasic.style";
 import { Txt } from "../Txt/Txt";
+import { Clock } from "../Clock/Clock";
 
-export function MeteoBasic(){
+export function MeteoBasic({ city, temperature, interpretation }){
     return (
         <>
             <View style={styles.clock}>
-                <Txt>Clock</Txt>
+                <Clock />
             </View>
             <View style={styles.city}>
-                <Txt>City</Txt>
+                <Txt>{city}</Txt>
             </View>
             <View style={styles.interpretation}>
-                <Txt style={styles.interpretation_txt}>Sunny</Txt>
+                <Txt style={styles.interpretation_txt}>{interpretation?.label}</Txt>
             </View>
             <View style={styles.temperature_box}>
-                <Txt style={styles.temperature}>3</Txt>
-                <Image style={styles.image} />
+                <Txt style={styles.temperature}>{temperature}°</Txt>
+                <Image style={styles.image} source={interpretation?.image}/>
             </View>
         </>
     )
