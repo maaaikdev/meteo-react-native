@@ -1,7 +1,7 @@
 import { styles } from "./App.style";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Home } from "./pages/Home/Home";
-import { ImageBackground } from "react-native";
+import { Alert, ImageBackground } from "react-native";
 import backgroundImg from "./assets/background.png";
 import { useEffect, useState } from "react";
 import {
@@ -10,6 +10,15 @@ import {
 } from "expo-location";
 import { MeteoAPI } from "./api/meteo";
 import { useFonts } from "expo-font";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Forecasts } from "./pages/Forecasts/Forecasts";
+const Stack = createNativeStackNavigator();
+const navTheme = {
+	colors: {
+		background: "transparent"
+	}
+}
 
 export default function App() {
 	const [coordinates, setCoordinates] = useState();
@@ -19,7 +28,6 @@ export default function App() {
 		"Alata-Regular": require("./assets/fonts/Alata-Regular.ttf"),
 	});
 
-	console.log("IS FONT", isFontLoaded);
 	useEffect(() => {
 		getUserCoordinates();
 	}, []);
@@ -41,7 +49,16 @@ export default function App() {
 	async function fetchCityByCoords(coords) {
 		const cityResponse = await MeteoAPI.fetchCityByCoords(coords);
 		setCity(cityResponse);
-  }
+  	}
+	
+	async function fetchCoordsByCity(city) {
+		try {
+			const coordsResponse = await MeteoAPI.fetchCoordsByCity(city);
+			setCoordinates(coordsResponse);
+		} catch (err){
+			Alert.alert("Ouch!", err)
+		}
+  	}
 	
 	async function getUserCoordinates() {
 		const { status } = await requestForegroundPermissionsAsync();
@@ -55,21 +72,34 @@ export default function App() {
 			setCoordinates({ lat: "48.85", lng: "2.35" });
 		}
 	}
+
 	
-	console.log(coordinates);
-	console.log(weather);
-	
-  return (
-		<ImageBackground
-			imageStyle={styles.img}
-			style={styles.img_background}
-			source={backgroundImg}
-		>
-			<SafeAreaProvider>
-				<SafeAreaView style={styles.container}>
-					{isFontLoaded && <Home city={city} weather={weather}/>}
-				</SafeAreaView>
-			</SafeAreaProvider>
-		</ImageBackground>
-  	);
+  	return (
+		<NavigationContainer theme={navTheme}>
+			<ImageBackground
+				imageStyle={styles.img}
+				style={styles.img_background}
+				source={backgroundImg}
+			>
+				<SafeAreaProvider>
+					<SafeAreaView style={styles.container}>
+						{isFontLoaded && weather && (
+							<Stack.Navigator 
+								screenOptions={{
+									headerShown: false,
+									animation: "fade"
+								}}
+								initialRouteName="Home"
+							>
+								<Stack.Screen name="Home">
+									{() => <Home city={city} weather={weather} onSubmitSearch={fetchCoordsByCity}/>}
+								</Stack.Screen>
+								<Stack.Screen name="Forecasts" component={Forecasts} />
+							</Stack.Navigator>
+						)}
+					</SafeAreaView>
+				</SafeAreaProvider>
+			</ImageBackground>  	
+		</NavigationContainer>
+	);
 }
